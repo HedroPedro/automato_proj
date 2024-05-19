@@ -4,4 +4,5 @@ Script feito em python 3 para simular um automato finito inserido por meio da li
 ## Requisitos
 - Interpretador python 3.x
 ## Como usar
-<code type="bash">asd</code>
+- Adicione o o automato e os testes na pasta onde está o script
+- Abra o terminar e execute o seguinte comando: ```python main.py automato.aut testes.in saida.out```
