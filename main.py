@@ -8,16 +8,16 @@ class Transition:
     to : int
 
     def __init__(self, transition_dict : dict) -> None:
-        self.de = transition_dict["from"]
+        self.de = int(transition_dict["from"])
         self.ler = transition_dict["read"]
-        self.to = transition_dict["to"]
+        self.to = int(transition_dict["to"])
     
     def __str__(self) -> str:
         return f"from: {self.de}, read: '{self.ler}', to: {self.to}"
 
 class Automata:
     initial: int
-    final: list[int] | int
+    final: list[int]
     transitions: list[Transition]
 
     def __init__(self, automata_dict : dict) -> None:
@@ -33,19 +33,48 @@ class Automata:
             transitions += transition.__str__() + "\n"
         return f"{{{self.initial}}}, {{{self.final}}}, {{{transitions}}}"
 
-    def compute(self, input : str):
-        pass
+    def compute(self, input : str) -> bool:
+        nodes_list = []
 
-    def deterministic_compute(self, input):
-        pass
+        sliced_input = input[1:]
+        for transition in self.transitions:
+            if self.initial == transition.de and (input[0] == transition.ler or transition.ler == "None"):
+                nodes_list.append(transition.to)
 
-    def underteministic_compute(self, input):
-        pass
+        if len(nodes_list) == 0:
+            return False
 
-    
+        if len(nodes_list) == 1:
+            return self.compute_determ(sliced_input, int(nodes_list[0]))
+        return
 
+    def compute_determ(self, input : str, current_node : int) -> bool:
+        sliced_input = input[1:]
+        nodes_list = []
+        if input == "":
+            return current_node in self.final
+        
+        for transition in self.transitions:
+            if current_node == transition.de and (input[0] == transition.ler or transition.ler == "None"):
+                nodes_list.append(int(transition.to))
 
-         
+        if len(nodes_list) == 0:
+            return False
+
+        if len(nodes_list) == 1:
+            return self.compute_determ(sliced_input, int(nodes_list[0]))
+        
+
+        return self.compute_underm(sliced_input, nodes_list)
+
+    def compute_underm(self, input : str, current_nodes : list[int]) -> bool:
+        sliced_input = input[1:]
+        nodes_list = []
+        bool_accumulator = 0 == 1
+        for node in current_nodes:
+            bool_accumulator = bool_accumulator or self.compute_determ(sliced_input, node)
+        return bool_accumulator
+     
 def get_input_list(input_list : list[str], separator : str = " "):
     input_lists = []
     for value in input_list:
@@ -67,7 +96,7 @@ input_list = get_input_list(input_file.read().strip().replace(";", " ").split("\
 
 for input in input_list:
     start_time = time()
-    isValid = automata.compute(input[0], automata.initial)
+    isValid = automata.compute(input[0])
     final_time = time() - start_time
     output_file.write(f"{input[0]};{input[1]};{1 if isValid else 0};{final_time}\n")
 
