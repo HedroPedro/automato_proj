@@ -1,6 +1,7 @@
+from os import get_terminal_size
 from json import loads
 from sys import argv
-from time import time, sleep
+from time import time
 
 class Transition:
     de : int
@@ -34,7 +35,7 @@ class Automata:
         transitions = ""
         for transition in self.transitions:
             transitions += transition.__str__() + "\n"
-        return f"{{{self.initial}}}, {{{self.final}}}, {{{transitions}}}"
+        return f"Inicial:{{{self.initial}}}, Finals: {{{self.final}}}, [\n{{{transitions}}}\n]"
 
     def compute(self, input : str) -> bool:
         nodes_list = []
@@ -72,10 +73,11 @@ class Automata:
 
     def compute_underm(self, input : str, current_nodes : list[int]) -> bool:
         sliced_input = input[1:]
-        nodes_list = []
         bool_accumulator = 0 == 1
+        print(bool_accumulator)
         for node in current_nodes:
             bool_accumulator = bool_accumulator or self.compute_determ(sliced_input, node)
+            print(bool_accumulator)
         return bool_accumulator
      
 def get_input_list(input_list : list[str], separator : str = " "):
@@ -97,11 +99,22 @@ except:
 automata = Automata(loads(automata_file.read()))
 input_list = get_input_list(input_file.read().strip().replace(";", " ").split("\n"))
 
+terminal_width = get_terminal_size().columns
+print(("="*terminal_width))
+print("AUTOMATO".center(terminal_width))
+print(("="*terminal_width), end="\n\n")
+print(f"Initial: {automata.initial}, Final: {automata.final}, [".center(terminal_width))
+for transition in automata.transitions:
+    print(f"{transition}".center(terminal_width))
+print("]".center(terminal_width-len(transition.__str__())), end="\n\n")
+print(("="*terminal_width), end="\n\n")
+print(("="*terminal_width))
+
 for input in input_list:
     start_time = time()
-    isValid = automata.compute(input[0])
+    is_valid = automata.compute(input[0])
     final_time = time() - start_time
-    output_file.write(f"{input[0]};{input[1]};{1 if isValid else 0};{final_time}\n")
+    output_file.write(f"{input[0]};{input[1]};{1 if is_valid else 0};{final_time}\n")
 
 automata_file.close()
 input_file.close()
