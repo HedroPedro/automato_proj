@@ -4,12 +4,15 @@ from time import time, sleep
 
 class Transition:
     de : int
-    ler : str | None
+    ler : str
     to : int
 
     def __init__(self, transition_dict : dict) -> None:
         self.de = int(transition_dict["from"])
-        self.ler = transition_dict["read"]
+        if transition_dict["read"] == None:
+            self.ler = "None"
+        else:
+            self.ler = transition_dict["read"]
         self.to = int(transition_dict["to"])
     
     def __str__(self) -> str:
