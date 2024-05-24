@@ -81,6 +81,7 @@ class Automata:
         return bool_accumulator
      
 def get_input_list(input_list : list[str], separator : str = " "):
+    input_list = input_list.strip().replace(";", " ").split("\n")
     input_lists = []
     for value in input_list:
         input_lists.append(value.split(separator))
@@ -97,7 +98,7 @@ except:
     raise FileNotFoundError()
 
 automata = Automata(loads(automata_file.read()))
-input_list = get_input_list(input_file.read().strip().replace(";", " ").split("\n"))
+input_list = get_input_list(input_file.read())
 
 terminal_width = get_terminal_size().columns
 print(("="*terminal_width))
