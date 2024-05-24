@@ -39,13 +39,28 @@ Script feito em python 3 para simular um automato finito inserido por meio da li
 ### Arquivo de entrada
 
 - O arquivo deve estar no formato csv, utilizando o ';' como separador
-- Deve primeiro vir a palavra desejada
+- Deve primeiro vir a palavra desejada e depois o resultado esparado
+- Um exemplo de arquivo seria:
 
-```csv
-word;1
+```text
+aaab;1
+bba;0
+...
+aaaabaab;1
 ```
 
 ### Arquio de saída
+
+- O arquivo de saída é um csv que utiliza o ';' como separador
+- Primeiro virá a palavra, resultado esperado, resultado atual e tempo de computação
+- Um exemplo de saida seria:
+
+```text
+aaab;1;1;0.0205
+bba;0;0
+...
+aaaabaab;1;0;01789
+```
 
 ## Como usar
 

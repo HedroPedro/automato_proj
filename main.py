@@ -13,7 +13,7 @@ class Transition:
         if transition_dict["read"] == None:
             self.ler = "None"
         else:
-            self.ler = transition_dict["read"]
+            self.ler = transition_dict["read"].lower()
         self.to = int(transition_dict["to"])
     
     def __str__(self) -> str:
