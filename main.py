@@ -6,18 +6,16 @@ from time import time
 class Transition:
     de : int
     ler : str
-    to : int
-
+    para : int
     def __init__(self, transition_dict : dict) -> None:
         self.de = int(transition_dict["from"])
         if transition_dict["read"] == None:
             self.ler = "None"
         else:
             self.ler = transition_dict["read"].lower()
-        self.to = int(transition_dict["to"])
-    
+        self.para = int(transition_dict["to"])
     def __str__(self) -> str:
-        return f"from: {self.de}, read: '{self.ler}', to: {self.to}"
+        return f"from: {self.de}, read: '{self.ler}', to: {self.para}"
 
 class Automata:
     initial: int
@@ -43,7 +41,7 @@ class Automata:
         sliced_input = input[1:]
         for transition in self.transitions:
             if self.initial == transition.de and (input[0] == transition.ler or transition.ler == "None"):
-                nodes_list.append(transition.to)
+                nodes_list.append(transition.para)
 
         if len(nodes_list) == 0:
             return False
@@ -60,7 +58,7 @@ class Automata:
         
         for transition in self.transitions:
             if current_node == transition.de and (input[0] == transition.ler or transition.ler == "None"):
-                nodes_list.append(int(transition.to))
+                nodes_list.append(int(transition.para))
 
         if len(nodes_list) == 0:
             return False
@@ -74,11 +72,23 @@ class Automata:
     def compute_underm(self, input : str, current_nodes : list[int]) -> bool:
         sliced_input = input[1:]
         bool_accumulator = 0 == 1
-        print(bool_accumulator)
         for node in current_nodes:
             bool_accumulator = bool_accumulator or self.compute_determ(sliced_input, node)
-            print(bool_accumulator)
         return bool_accumulator
+    
+    def convert_transitions_to_dict(self) -> dict:
+        transition_dict = {}
+        for transition in self.transitions:
+            key = f"{transition.de}{transition.ler}"
+            if not key in transition_dict.keys():
+                transition_dict[key] = [transition.para]
+            else:
+                para_list : list[int] =  transition_dict[key]
+                para_list.append(transition.para)
+                transition_dict[key] = para_list
+        return transition_dict
+    
+
      
 def get_input_list(input_list : list[str], separator : str = " "):
     input_list = input_list.strip().replace(";", " ").split("\n")
@@ -99,7 +109,8 @@ except:
 
 automata = Automata(loads(automata_file.read()))
 input_list = get_input_list(input_file.read())
-
+transitions_dict = automata.convert_transitions_to_dict()
+print(transitions_dict)
 terminal_width = get_terminal_size().columns
 print(("="*terminal_width))
 print("AUTOMATO".center(terminal_width))

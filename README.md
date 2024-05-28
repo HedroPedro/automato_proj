@@ -66,4 +66,4 @@ aaaabaab;1;0;01789
 
 - Adicione o o automato e os testes na pasta onde está o script
 - Abra o terminar e execute o seguinte comando: ```python main.py automato.aut testes.in saida.out```
-- O resultado sera sobrescrito no ultimo argumento, se existir, caso não exista, o arquivo é criado
+- O resultado sera sobrescrito no ultimo argumento, se existir, caso não exista, o arquivo então é criado
