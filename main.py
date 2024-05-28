@@ -21,6 +21,7 @@ class Automata:
     initial: int
     final: list[int]
     transitions: list[Transition]
+    transitions_dict : dict
 
     def __init__(self, automata_dict : dict) -> None:
         self.initial = automata_dict["initial"]
@@ -86,8 +87,34 @@ class Automata:
                 para_list : list[int] =  transition_dict[key]
                 para_list.append(transition.para)
                 transition_dict[key] = para_list
+        self.transitions_dict = transition_dict
         return transition_dict
     
+    def init_with_transitions_dict(self, input : str) -> bool:
+        if(self.transitions_dict == {}):
+            raise Exception("Dicinario nao montado")
+        return self.compute_transitions_dict(input, self.initial)
+    
+    def compute_transitions_dict(self, input : str, current_node : int) -> bool:
+        if input == "":
+            return current_node in self.final
+        key = f"{current_node}{input[0]}"
+        void_key = f"{current_node}{None}"
+        to_go_list = []
+        bool_accumulator = 0 == 1
+        if key in self.transitions_dict.keys():
+            to_go_list.extend(self.transitions_dict[key])
+
+        if void_key in self.transitions_dict.keys():
+            to_go_list.extend(self.transitions_dict[void_key])
+
+        if len(to_go_list) == 0:
+            return False
+        
+        for node in to_go_list:
+            bool_accumulator = bool_accumulator or self.compute_transitions_dict(input[1:len(input)], node)
+
+        return bool_accumulator
 
      
 def get_input_list(input_list : list[str], separator : str = " "):
@@ -110,7 +137,6 @@ except:
 automata = Automata(loads(automata_file.read()))
 input_list = get_input_list(input_file.read())
 transitions_dict = automata.convert_transitions_to_dict()
-print(transitions_dict)
 terminal_width = get_terminal_size().columns
 print(("="*terminal_width))
 print("AUTOMATO".center(terminal_width))
@@ -118,13 +144,13 @@ print(("="*terminal_width), end="\n\n")
 print(f"Initial: {automata.initial}, Final: {automata.final}, [".center(terminal_width))
 for transition in automata.transitions:
     print(f"{transition}".center(terminal_width))
-print("]".center(terminal_width-len(transition.__str__())), end="\n\n")
+print("]".center(terminal_width-(len(transition.__str__())+1)), end="\n\n")
 print(("="*terminal_width), end="\n\n")
 print(("="*terminal_width))
 
 for input in input_list:
     start_time = time()
-    is_valid = automata.compute(input[0])
+    is_valid = automata.init_with_transitions_dict(input[0])
     final_time = time() - start_time
     output_file.write(f"{input[0]};{input[1]};{1 if is_valid else 0};{final_time}\n")
 
