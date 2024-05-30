@@ -64,6 +64,7 @@ aaaabaab;1;0;0.1789
 
 ## Como usar
 
-- Adicione o o automato e os testes na pasta onde está o script
-- Abra o terminar e execute o seguinte comando: ```python main.py automato.aut testes.in saida.out```
+- Adicione o automato e os testes na pasta onde está o script
+- O programa nescessita de três argumentos extras, o arquivo do automato (.aut), a entrada (.in) e a saida (.out), nesta ordem
+- Abra o terminar e execute o seguinte comando: ```python main.py arquivo.aut entrada.in saida.out```, substituindo arquivo.aut, entrada.in e saida.out pelo nome dos seus arquivos
 - O resultado sera sobrescrito no ultimo argumento, se existir, caso não exista, o arquivo então é criado
