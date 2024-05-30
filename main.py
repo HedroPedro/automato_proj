@@ -34,7 +34,7 @@ class Automata:
         transitions = ""
         for transition in self.transitions:
             transitions += transition.__str__() + "\n"
-        return f"Inicial:{{{self.initial}}}, Finals: {{{self.final}}}, [\n{{{transitions}}}\n]"
+        return f"Inicial:{{{self.initial}}}, Finais: {{{self.final}}}, [\n{{{transitions}}}\n]"
 
     def compute(self, input : str) -> bool:
         nodes_list = []
@@ -49,7 +49,7 @@ class Automata:
 
         if len(nodes_list) == 1:
             return self.compute_determ(sliced_input, int(nodes_list[0]))
-        return
+        return self.compute_underm(sliced_input, nodes_list)
 
     def compute_determ(self, input : str, current_node : int) -> bool:
         sliced_input = input[1:]
@@ -101,7 +101,7 @@ class Automata:
         key = f"{current_node}{input[0]}"
         void_key = f"{current_node}{None}"
         to_go_list = []
-        bool_accumulator = 0 == 1
+        bool_accumulator = bool(False)
         if key in self.transitions_dict.keys():
             to_go_list.extend(self.transitions_dict[key])
 
@@ -141,7 +141,7 @@ terminal_width = get_terminal_size().columns
 print(("="*terminal_width))
 print("AUTOMATO".center(terminal_width))
 print(("="*terminal_width), end="\n\n")
-print(f"Initial: {automata.initial}, Final: {automata.final}, [".center(terminal_width))
+print(f"Inicial: {automata.initial}, Finais: {automata.final}, [".center(terminal_width))
 for transition in automata.transitions:
     print(f"{transition}".center(terminal_width))
 print("]".center(terminal_width-(len(transition.__str__())+1)), end="\n\n")
@@ -153,7 +153,7 @@ for input in input_list:
     is_valid = automata.init_with_transitions_dict(input[0])
     final_time = time() - start_time
     output_file.write(f"{input[0]};{input[1]};{1 if is_valid else 0};{final_time}\n")
-
+print(f"Resultados salvos em: {argv[3]}")
 automata_file.close()
 input_file.close()
 output_file.close()
