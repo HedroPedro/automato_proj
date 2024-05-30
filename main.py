@@ -55,7 +55,7 @@ class Automata:
 
         return bool_accumulator
     
-    def convert_transitions_to_dict(self) -> dict:
+    def convert_transitions_to_dict(self) -> None:
         transition_dict = {}
         for transition in self.transitions:
             key = f"{transition.de}{transition.ler}"
@@ -66,7 +66,6 @@ class Automata:
                 para_list.append(transition.para)
                 transition_dict[key] = para_list
         self.transitions_dict = transition_dict
-        return transition_dict
     
     def init_with_transitions_dict(self, input : str) -> bool:
         if(self.transitions_dict == {}):
@@ -114,7 +113,6 @@ except:
 
 automata = Automata(loads(automata_file.read()))
 input_list = get_input_list(input_file.read())
-transitions_dict = automata.convert_transitions_to_dict()
 terminal_width = get_terminal_size().columns
 print(("="*terminal_width))
 print("AUTOMATO".center(terminal_width))
@@ -125,6 +123,8 @@ for transition in automata.transitions:
 print("]".center(terminal_width-(len(transition.__str__())+1)), end="\n\n")
 print(("="*terminal_width), end="\n\n")
 print(("="*terminal_width))
+
+automata.convert_transitions_to_dict()
 
 for input in input_list:
     start_time = time()
