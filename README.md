@@ -14,7 +14,7 @@ Script feito em python 3 para simular um automato finito inserido por meio da li
 
 - O arquivo de entrada deve estar em formato json com a seguinte estrutura:
 
-```json
+```
 {
     "initial": int,
     "final": int[],
@@ -28,7 +28,7 @@ Script feito em python 3 para simular um automato finito inserido por meio da li
         .
         ., 
         {
-            "from": int | str,
+            "from": a | str,
             "to": str | int,
             "read": str | null
         }
