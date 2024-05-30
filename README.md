@@ -28,7 +28,7 @@ Script feito em python 3 para simular um automato finito inserido por meio da li
         .
         ., 
         {
-            "from": a | str,
+            "from": int | str,
             "to": str | int,
             "read": str | null
         }
@@ -59,7 +59,7 @@ aaaabaab;1
 aaab;1;1;0.0205
 bba;0;0
 ...
-aaaabaab;1;0;01789
+aaaabaab;1;0;0.1789
 ```
 
 ## Como usar
