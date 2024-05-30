@@ -9,13 +9,11 @@ class Transition:
     para : int
     def __init__(self, transition_dict : dict) -> None:
         self.de = int(transition_dict["from"])
-        if transition_dict["read"] == None:
+        if transition_dict["read"] == None or transition_dict["read"] == "None" or transition_dict["read"] == "null":
             self.ler = "None"
         else:
             self.ler = transition_dict["read"].lower()
         self.para = int(transition_dict["to"])
-    def __str__(self) -> str:
-        return f"from: {self.de}, read: '{self.ler}', to: {self.para}"
 
 class Automata:
     initial: int
@@ -36,45 +34,25 @@ class Automata:
             transitions += transition.__str__() + "\n"
         return f"Inicial:{{{self.initial}}}, Finais: {{{self.final}}}, [\n{{{transitions}}}\n]"
 
-    def compute(self, input : str) -> bool:
+    def init_with_list(self, input : str) -> bool:
+        return self.compute_list(input, self.initial)
+
+    def compute_list(self, input : str, current_node : int) -> bool:
         nodes_list = []
-
-        sliced_input = input[1:]
-        for transition in self.transitions:
-            if self.initial == transition.de and (input[0] == transition.ler or transition.ler == "None"):
-                nodes_list.append(transition.para)
-
-        if len(nodes_list) == 0:
-            return False
-
-        if len(nodes_list) == 1:
-            return self.compute_determ(sliced_input, int(nodes_list[0]))
-        return self.compute_underm(sliced_input, nodes_list)
-
-    def compute_determ(self, input : str, current_node : int) -> bool:
-        sliced_input = input[1:]
-        nodes_list = []
+        bool_accumulator = bool(False)
         if input == "":
             return current_node in self.final
         
         for transition in self.transitions:
             if current_node == transition.de and (input[0] == transition.ler or transition.ler == "None"):
-                nodes_list.append(int(transition.para))
+                nodes_list.append(transition.para)
 
         if len(nodes_list) == 0:
             return False
-
-        if len(nodes_list) == 1:
-            return self.compute_determ(sliced_input, int(nodes_list[0]))
         
+        for node in nodes_list:
+            bool_accumulator = bool_accumulator or self.compute_list(input[1:], node)
 
-        return self.compute_underm(sliced_input, nodes_list)
-
-    def compute_underm(self, input : str, current_nodes : list[int]) -> bool:
-        sliced_input = input[1:]
-        bool_accumulator = 0 == 1
-        for node in current_nodes:
-            bool_accumulator = bool_accumulator or self.compute_determ(sliced_input, node)
         return bool_accumulator
     
     def convert_transitions_to_dict(self) -> dict:
@@ -112,7 +90,7 @@ class Automata:
             return False
         
         for node in to_go_list:
-            bool_accumulator = bool_accumulator or self.compute_transitions_dict(input[1:len(input)], node)
+            bool_accumulator = bool_accumulator or self.compute_transitions_dict(input[1:], node)
 
         return bool_accumulator
 
