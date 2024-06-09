@@ -30,7 +30,7 @@ def main():
     print(("="*terminal_width), end="\n\n")
     print(f"Inicial: {automata.initial}, Finais: {automata.final}, [".center(terminal_width))
     for transition in automata.transitions:
-        print(f"{transition}".center(terminal_width))
+        print(f"{transition}".center(terminal_width-1))
     print("]".center(terminal_width-(len(transition.__str__())+1)), end="\n\n")
     print(("="*terminal_width), end="\n\n")
     print(("="*terminal_width))
