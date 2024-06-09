@@ -1,7 +1,7 @@
 from os import get_terminal_size
 from json import loads
 from sys import argv
-from time import time
+from time import time_ns
 
 class Transition:
     de : int
@@ -14,6 +14,9 @@ class Transition:
         else:
             self.ler = transition_dict["read"].lower()
         self.para = int(transition_dict["to"])
+
+    def __str__(self) -> str:
+        return f"de: {self.de}; ler: {self.ler}; para: {self.para}"
 
 class Automata:
     initial: int
@@ -34,26 +37,22 @@ class Automata:
             transitions += transition.__str__() + "\n"
         return f"Inicial:{{{self.initial}}}, Finais: {{{self.final}}}, [\n{{{transitions}}}\n]"
 
-    def init_with_list(self, input : str) -> bool:
-        return self.compute_list(input, self.initial)
-
-    def compute_list(self, input : str, current_node : int) -> bool:
-        nodes_list = []
-        bool_accumulator = bool(False)
-        if input == "":
-            return current_node in self.final
-        
-        for transition in self.transitions:
-            if current_node == transition.de and (input[0] == transition.ler or transition.ler == "None"):
-                nodes_list.append(transition.para)
-
-        if len(nodes_list) == 0:
-            return False
-        
-        for node in nodes_list:
-            bool_accumulator = bool_accumulator or self.compute_list(input[1:], node)
-
-        return bool_accumulator
+    def compute_list(self, input : str) -> bool:
+        current_nodes = [self.initial]
+        for char in input:
+            for node in current_nodes:
+                tmp_list = []
+                for transition in self.transitions:
+                    if transition.de == node and (transition.ler == char or transition.ler == "None"):
+                        tmp_list.append(transition.para)
+            current_nodes = tmp_list.copy()
+            if current_nodes == []:
+                return False
+            
+        for final_node in current_nodes:
+            if final_node in self.final:
+                return True
+        return False
     
     def convert_transitions_to_dict(self) -> None:
         transition_dict = {}
@@ -67,33 +66,29 @@ class Automata:
                 transition_dict[key] = para_list
         self.transitions_dict = transition_dict
     
-    def init_with_transitions_dict(self, input : str) -> bool:
-        if(self.transitions_dict == {}):
-            raise Exception("Dicinario nao montado")
-        return self.compute_transitions_dict(input, self.initial)
-    
-    def compute_transitions_dict(self, input : str, current_node : int) -> bool:
-        if input == "":
-            return current_node in self.final
-        key = f"{current_node}{input[0]}"
-        void_key = f"{current_node}{None}"
-        to_go_list = []
-        bool_accumulator = bool(False)
-        if key in self.transitions_dict.keys():
-            to_go_list.extend(self.transitions_dict[key])
-
-        if void_key in self.transitions_dict.keys():
-            to_go_list.extend(self.transitions_dict[void_key])
-
-        if len(to_go_list) == 0:
-            return False
+    def compute_transitions_dict(self, input : str) -> bool:
+        current_nodes = [self.initial]
+        for char in input:
+            tmp_list = []
+            for node in current_nodes:
+                try:
+                    tmp_list.extend(self.transitions_dict[f"{node}{char}"])
+                except:
+                    pass
+                try:
+                    tmp_list.extend(self.transitions_dict[f"{node}None"])
+                except:
+                    pass
+            current_nodes = tmp_list.copy()
+            if current_nodes == []:
+                return False
         
-        for node in to_go_list:
-            bool_accumulator = bool_accumulator or self.compute_transitions_dict(input[1:], node)
+        for final_node in current_nodes:
+            if final_node in self.final:
+                return True
 
-        return bool_accumulator
-
-     
+        return False
+   
 def get_input_list(input_list : list[str], separator : str = " "):
     input_list = input_list.strip().replace(";", " ").split("\n")
     input_lists = []
@@ -101,37 +96,39 @@ def get_input_list(input_list : list[str], separator : str = " "):
         input_lists.append(value.split(separator))
     return input_lists
 
-if(len(argv) < 4):
-    raise Exception("Menos de três argumentos")
+def main():
+    if(len(argv) < 4):
+        raise Exception("Menos de três argumentos")
+    try:
+        automata_file = open(argv[1])
+        input_file = open(argv[2])
+        output_file = open(argv[3], "w")
+    except:
+        raise FileNotFoundError()
 
-try:
-    automata_file = open(argv[1])
-    input_file = open(argv[2])
-    output_file = open(argv[3], "w")
-except:
-    raise FileNotFoundError()
+    automata = Automata(loads(automata_file.read()))
+    automata.convert_transitions_to_dict()
+    input_list = get_input_list(input_file.read())
+    terminal_width = get_terminal_size().columns
+    print(("="*terminal_width))
+    print("AUTOMATO".center(terminal_width))
+    print(("="*terminal_width), end="\n\n")
+    print(f"Inicial: {automata.initial}, Finais: {automata.final}, [".center(terminal_width))
+    for transition in automata.transitions:
+        print(f"{transition}".center(terminal_width))
+    print("]".center(terminal_width-(len(transition.__str__())+1)), end="\n\n")
+    print(("="*terminal_width), end="\n\n")
+    print(("="*terminal_width))
 
-automata = Automata(loads(automata_file.read()))
-input_list = get_input_list(input_file.read())
-terminal_width = get_terminal_size().columns
-print(("="*terminal_width))
-print("AUTOMATO".center(terminal_width))
-print(("="*terminal_width), end="\n\n")
-print(f"Inicial: {automata.initial}, Finais: {automata.final}, [".center(terminal_width))
-for transition in automata.transitions:
-    print(f"{transition}".center(terminal_width))
-print("]".center(terminal_width-(len(transition.__str__())+1)), end="\n\n")
-print(("="*terminal_width), end="\n\n")
-print(("="*terminal_width))
+    for input in input_list:
+        start_time = time_ns()
+        is_valid = automata.compute_transitions_dict(input[0])
+        final_time = time_ns() - start_time
+        output_file.write(f"{input[0]};{input[1]};{1 if is_valid else 0};{final_time}\n")
+    print(f"Resultados salvos em: {argv[3]}")
+    automata_file.close()
+    input_file.close()
+    output_file.close()
 
-automata.convert_transitions_to_dict()
-
-for input in input_list:
-    start_time = time()
-    is_valid = automata.init_with_transitions_dict(input[0])
-    final_time = time() - start_time
-    output_file.write(f"{input[0]};{input[1]};{1 if is_valid else 0};{final_time}\n")
-print(f"Resultados salvos em: {argv[3]}")
-automata_file.close()
-input_file.close()
-output_file.close()
+if __name__ == "__main__":
+    main()
